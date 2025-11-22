@@ -1,5 +1,5 @@
 // src/app.js
-require("dotenv").config(); // For local dev; not needed in Azure
+const expressLayouts = require("express-ejs-layouts");
 const express = require("express");
 const path = require("path");
 const routes = require("./routes");
@@ -10,13 +10,11 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(express.urlencoded({ extended: true }));
 
-
-// View engine
 app.set("views", path.join(__dirname, "..", "views"));
 app.set("view engine", "ejs");
 
-// Static files (if you add CSS later)
-app.use(express.static(path.join(__dirname, "..", "public")));
+app.use(expressLayouts);
+app.set("layout", "layout");
 
 // Routes
 app.use("/", routes);
