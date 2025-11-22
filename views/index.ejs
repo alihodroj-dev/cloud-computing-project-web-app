@@ -1,0 +1,46 @@
+<% layout('layout') %>
+
+<h1>My ToDo List</h1>
+
+<form action="/todos" method="POST">
+  <input~
+    type="text"
+    name="title"
+    placeholder="What do you need to do?"
+    required
+  />
+  <button type="submit" class="primary">Add</button>
+</form>
+
+<ul>
+  <% if (todos.length === 0) { %>
+  <li>No tasks yet. Add your first task above!</li>
+  <% } %>
+
+  <% todos.forEach(todo => { %>
+  <li>
+    <div>
+      <div
+        class="todo-title <%= todo.IsCompleted ? 'completed' : '' %>"
+      >
+        <%= todo.Title %>
+      </div>
+      <div class="todo-meta">
+        Created at:
+        <%= new Date(todo.CreatedAt).toLocaleString() %>
+      </div>
+    </div>
+
+    <div class="todo-actions">
+      <form action="/todos/<%= todo.Id %>/toggle" method="POST">
+        <button type="submit">
+          <%= todo.IsCompleted ? 'Unmark' : 'Complete' %>
+        </button>
+      </form>
+      <form action="/todos/<%= todo.Id %>/delete" method="POST">
+        <button type="submit" class="danger">Delete</button>
+      </form>
+    </div>
+  </li>
+  <% }) %>
+</ul>
