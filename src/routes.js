@@ -8,7 +8,7 @@ router.get("/", async (req, res) => {
     const pool = await getPool();
     const result = await pool
       .request()
-      .query("SELECT Id, Title, Description, Severity, IsResolved, CreatedAt FROM Issues ORDER BY CreatedAt DESC");
+      .query("SELECT Id, Title, Description, Severity, IsResolved, CreatedAt FROM [dbo].[Issues] ORDER BY CreatedAt DESC");
 
     res.render("index", { issues: result.recordset });
   } catch (err) {
