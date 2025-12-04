@@ -1,17 +1,17 @@
 {
-    "name": "azure-todo-app",
-    "version": "1.0.0",
-    "description": "Simple ToDo list web app using Node.js, Express, and Azure SQL",
-    "main": "src/app.js",
-    "scripts": {
-      "start": "node src/app.js",
-      "dev": "nodemon src/app.js"
-    },
-    "dependencies": {
-      "dotenv": "^16.4.0",
-      "ejs": "^3.1.9",
-      "express": "^4.19.0",
-      "mssql": "^10.0.0",
-      "express-ejs-layouts": "^2.5.1"
-    }
+  "name": "azure-issue-tracker-app",
+  "version": "1.0.0",
+  "description": "Simple Issue Tracking app",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.0",
+    "ejs": "^3.1.9",
+    "express": "^4.19.0",
+    "mssql": "^10.0.0",
+    "express-ejs-layouts": "^2.5.1"
   }
+}

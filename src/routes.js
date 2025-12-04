@@ -3,91 +3,75 @@ const express = require("express");
 const router = express.Router();
 const { getPool } = require("./db");
 
-// List all todos
 router.get("/", async (req, res) => {
   try {
     const pool = await getPool();
     const result = await pool
       .request()
-      .query("SELECT Id, Title, IsCompleted, CreatedAt FROM Todos ORDER BY CreatedAt DESC");
+      .query("SELECT Id, Title, Description, Severity, IsResolved, CreatedAt FROM Issues ORDER BY CreatedAt DESC");
 
-    res.render("index", { todos: result.recordset });
+    res.render("index", { issues: result.recordset });
   } catch (err) {
-    console.error("Error fetching todos:", err);
-    res.status(500).send("Error fetching todos");
+    console.error("Error fetching issues:", err);
+    res.status(500).send("Error fetching issues");
   }
 });
 
-// Add new todo
-router.post("/todos", async (req, res) => {
-  const { title } = req.body;
+router.post("/issues", async (req, res) => {
+  const { title, description, severity } = req.body;
   if (!title || !title.trim()) {
     return res.redirect("/");
   }
+
+  // Validate severity
+  const validSeverities = ["Low", "Medium", "High"];
+  const issueSeverity = validSeverities.includes(severity) ? severity : "Low";
 
   try {
     const pool = await getPool();
     await pool
       .request()
       .input("Title", title.trim())
+      .input("Description", description ? description.trim() : "")
+      .input("Severity", issueSeverity)
       .query(`
-        INSERT INTO Todos (Title, IsCompleted)
-        VALUES (@Title, 0)
+        INSERT INTO Issues (Title, Description, Severity, IsResolved)
+        VALUES (@Title, @Description, @Severity, 0)
       `);
 
     res.redirect("/");
   } catch (err) {
-    console.error("Error creating todo:", err);
-    res.status(500).send("Error creating todo");
+    console.error("Error creating issue:", err);
+    res.status(500).send("Error creating issue");
   }
 });
 
-// Toggle completion
-router.post("/todos/:id/toggle", async (req, res) => {
+router.post("/issues/:id/resolve", async (req, res) => {
   const { id } = req.params;
 
   try {
     const pool = await getPool();
 
-    // Get current value
+    // Check if issue exists
     const current = await pool
       .request()
       .input("Id", id)
-      .query("SELECT IsCompleted FROM Todos WHERE Id = @Id");
+      .query("SELECT IsResolved FROM Issues WHERE Id = @Id");
 
     if (current.recordset.length === 0) {
-      return res.status(404).send("Todo not found");
+      return res.status(404).send("Issue not found");
     }
 
-    const newValue = current.recordset[0].IsCompleted ? 0 : 1;
-
+    // Mark as resolved
     await pool
       .request()
       .input("Id", id)
-      .input("IsCompleted", newValue)
-      .query("UPDATE Todos SET IsCompleted = @IsCompleted WHERE Id = @Id");
+      .query("UPDATE Issues SET IsResolved = 1 WHERE Id = @Id");
 
     res.redirect("/");
   } catch (err) {
-    console.error("Error toggling todo:", err);
-    res.status(500).send("Error toggling todo");
-  }
-});
-
-// Delete todo
-router.post("/todos/:id/delete", async (req, res) => {
-  const { id } = req.params;
-  try {
-    const pool = await getPool();
-    await pool
-      .request()
-      .input("Id", id)
-      .query("DELETE FROM Todos WHERE Id = @Id");
-
-    res.redirect("/");
-  } catch (err) {
-    console.error("Error deleting todo:", err);
-    res.status(500).send("Error deleting todo");
+    console.error("Error resolving issue:", err);
+    res.status(500).send("Error resolving issue");
   }
 });
 
